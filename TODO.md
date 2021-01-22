@@ -5,12 +5,9 @@
 3. Create a github repository
 4. Initialize with a README.md
 
-## optional
+## Tools to Learn
 
-The user may give N number of parameters that may add in to the project.
-
-Such as: 
-
-	* LICENSE
-	* gitignore
-	
+- Github API
+- Github App or OAuth App
+- Github Licenses API
+- Network Library : curlPP
