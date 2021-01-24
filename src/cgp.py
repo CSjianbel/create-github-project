@@ -17,6 +17,7 @@ except ModuleNotFoundError:
     print("(Run): pip install -r requirements.txt")
     sys.exit(2)
 
+# Github API's
 GITHUB_BASE_URL = "https://github.com"
 GITHUB_LICENSE_API = "https://api.github.com/licenses/"
 GITHUB_GITIGNORE_API = "https://api.github.com/gitignore/templates/"
@@ -68,10 +69,10 @@ def main():
         repo.create_file(".gitignore", "Added gitignore Template", gitignoreContent)
     
     # Clone Remote Repository
-    print(f"https://github.com/{user.login}/{args.repoName}")
+    os.mkdir(args.repoName)
+    pygit2.clone_repository(f"{GITHUB_BASE_URL}/{user.login}/{args.repoName}", args.repoName)
 
-    pygit2.clone_repository(f"{GITHUB_BASE_URL}/{user.login}/{args.repoName}", ".")
-
+    print(f"Repository Url: https://github.com/{user.login}/{args.repoName}")
     print("Github Repository Created/Initialized and Cloned Locally :)")
 
     
@@ -89,7 +90,11 @@ def verifyAuthentication(g):
 
 
 def generateLicense(repo, license):
-
+    """
+    Generate License Template throught github api
+    param: Github Repo Object, str
+    return: None | int | str
+    """
     if not license:
         return None
 
@@ -101,7 +106,11 @@ def generateLicense(repo, license):
 
 
 def generateGitignore(repo, key):
-
+    """
+    Generate .gitignore Template throught github api
+    param: Github Repo Object, str
+    return: None | int | str
+    """
     if not key:
         return None
 
