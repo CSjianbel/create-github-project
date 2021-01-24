@@ -18,7 +18,7 @@ pip install -r requirements.txt
 
 cd src
 
-pyinstaller cgp.py
+pyinstaller --onefile cgp.py
 ```
 
 ## Setup

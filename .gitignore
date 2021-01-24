@@ -6,3 +6,6 @@ lib64
 share/
 pyvenv.cfg
 .env
+build/
+cgp.spec
+dist/
