@@ -3,6 +3,7 @@ import sys
 
 try:
     from github import Github
+    import github
     from dotenv import load_dotenv
     load_dotenv()
 except ModuleNotFoundError:
@@ -15,6 +16,7 @@ if len(sys.argv) not in list(range(3, 6)):
     sys.exit(1)
 
 def main():
+
     print(os.environ["access_token"])
 
     g = Github(os.environ["access_token"])
@@ -22,21 +24,20 @@ def main():
     # Verify Authentication
     if not verifyAuthentication(g):
         print("Authentication Failed Verify your access token...")
+        sys.exit(3)
 
 
-    # Then play with your Github objects:
-    for repo in g.get_user().get_repos():
-        print(repo.name)
     
 def verifyAuthentication(g):
-
-    # ff36637c46f3415b6753bf950d5c9df9ca24d63b
-
+    """
+    Verifies Authentication to Github
+    Param: Github object
+    Return: Boolean
+    """
     try:
-        g.get_user().get_repos()
-    except:
+        g.get_user().login
+    except github.GithubException.BadCredentialsException:
         return False
-
     return True
 
 
