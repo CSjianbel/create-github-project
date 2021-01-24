@@ -33,7 +33,7 @@ Therefore you will have access to the executable globally in your system.<br />
 - Follow the **Compilation** steps
 - Move the compiled executable made by **PyInstaller** to the directory made in **~/bin/**
 - Create a personal acceess token on github, and create a **.env** file
-- Add this line "access_token=[Your Token]" to your **.env**
+- Add your token inside your **.env**
 - Add the directory of the executable to your **PATH**
 
 ## Usage

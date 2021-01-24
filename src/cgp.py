@@ -9,8 +9,6 @@ try:
     from github import Github
     import github
     import pygit2
-    from dotenv import load_dotenv
-    load_dotenv()
 
 except ModuleNotFoundError:
     print("Required Modules Not Installed...")
@@ -22,6 +20,8 @@ GITHUB_BASE_URL = "https://github.com"
 GITHUB_LICENSE_API = "https://api.github.com/licenses/"
 GITHUB_GITIGNORE_API = "https://api.github.com/gitignore/templates/"
 
+# access token .env
+ACCESS_TOKEN = "/home/jianbel/bin/create-github-project/.env"
 
 def main():
     """
@@ -37,8 +37,9 @@ def main():
     parser.add_argument("-ra", "--repoAccess", default="public", help="Create a public or private repository. [DEFAULT: public]", type=str)
     args = parser.parse_args()
 
+    token = getToken()
     # Creata a Github Instance
-    g = Github(os.environ["access_token"])
+    g = Github(token)
 
     # Verify Authentication
     if not verifyAuthentication(g):
@@ -57,7 +58,7 @@ def main():
     if type(licenseContent) == int:
         print(f"Invalid License Key : API returned with a status code of {licenseContent}")
         sys.exit(5)
-    else:
+    elif licenseContent:
         repo.create_file("LICENSE", "Added License", licenseContent)
 
     # Generate .gitignore
@@ -65,7 +66,7 @@ def main():
     if type(gitignoreContent) == int:
         print(f"Invalid Gitignore Key : API returned with a status code of {gitignoreContent}")
         sys.exit(5)
-    else:
+    elif gitignoreContent:
         repo.create_file(".gitignore", "Added gitignore Template", gitignoreContent)
     
     # Clone Remote Repository
@@ -119,6 +120,15 @@ def generateGitignore(repo, key):
         return r.status_code
 
     return r.json()["source"]
+
+
+def getToken():
+    """
+    Gets Personal Access Token on set .env PATH
+    return: str
+    """
+    with open(ACCESS_TOKEN) as f:
+        return f.read().strip("\n")
 
 
 if __name__ == "__main__":
