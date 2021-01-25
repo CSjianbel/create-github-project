@@ -30,10 +30,12 @@ Therefore you will have access to the executable globally in your system.<br />
 
 - Create a **bin/** directory in your root directory (~)
 - Create another directory within the bin directory
-- Follow the **Compilation** steps
-- Move the compiled executable made by **PyInstaller** to the directory made in **~/bin/**
 - Create a personal acceess token on github, and create a **.env** file
 - Add your token inside your **.env**
+- Go to the cloned git repo then modify **src/cgp.py**
+- Look for **ACCESS\_TOKEN** variable and modify it to your desired path to the **.env** file that contains the token
+- Follow the **Compilation** steps
+- Move the compiled executable made by **PyInstaller** to the directory made in **~/bin/**
 - Add the directory of the executable to your **PATH**
 
 ## Usage
