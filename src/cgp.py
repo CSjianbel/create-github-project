@@ -17,8 +17,8 @@ except ModuleNotFoundError:
 
 # Github API's
 GITHUB_BASE_URL = "https://github.com"
-GITHUB_LICENSE_API = "https://api.github.com/licenses/"
-GITHUB_GITIGNORE_API = "https://api.github.com/gitignore/templates/"
+GITHUB_LICENSE_API = "https://api.github.com/licenses"
+GITHUB_GITIGNORE_API = "https://api.github.com/gitignore/templates"
 
 # access token .env
 ACCESS_TOKEN = "/home/jianbel/bin/create-github-project/.env"
@@ -34,8 +34,13 @@ def main():
     parser.add_argument("repoName", help="Repository Name", type=str)
     parser.add_argument("-l", "--license", help="Initialize Repository with (X) License", type=str)
     parser.add_argument("-gi", "--gitignore", help="Initialize Repository with (X) gitignore template", type=str)
+    parser.add_argument("-gtk", "--get-template-keys", help="Get Template keys for [git, license] from github api", type=str)
     parser.add_argument("-ra", "--repoAccess", default="public", help="Create a public or private repository. [DEFAULT: public]", type=str)
     args = parser.parse_args()
+
+    # If user wants to see template keys for license or gitignore templates from github api
+    if args.get_template_keys:
+        sys.exit(getTemplateKeys(args.get_template_keys))
 
     token = getToken()
     # Creata a Github Instance
@@ -93,6 +98,37 @@ def verifyAuthentication(g):
     except github.GithubException:
         return False
     return True
+        
+        
+def getTemplateKeys(k):
+    """
+    Prints out templates key for license or gitignore templates from github api
+    Params: str
+    Return: code
+    """
+    code = 0
+    if k.lower() == "license":
+        r = requests.get(GITHUB_LICENSE_API)
+        if r.status_code != 200:
+            code = 1
+        
+        print("Github LICENSE template keys: ")
+        for item in r.json():
+            print(item["key"])
+    elif k.lower() == "git":
+        r = requests.get(GITHUB_GITIGNORE_API)
+        if r.status_code != 200:
+            code = 1
+        
+        print("Github .gitignore template keys: ")
+        for item in r.json():
+            print(item)
+
+    else:
+        print("Invalid argument for --get-template-keys! : options [git, license]")
+        code = 2
+
+    return code
 
 
 def generateLicense(repo, license):
@@ -104,7 +140,7 @@ def generateLicense(repo, license):
     if not license:
         return None
 
-    r = requests.get(GITHUB_LICENSE_API + license)
+    r = requests.get(f"{GITHUB_LICENSE_API}/{license}")
     if r.status_code != 200:
         return r.status_code
     
@@ -120,7 +156,7 @@ def generateGitignore(repo, key):
     if not key:
         return None
 
-    r = requests.get(GITHUB_GITIGNORE_API + key)
+    r = requests.get(f"{GITHUB_GITIGNORE_API}/{key}")
     if r.status_code != 200:
         return r.status_code
 
