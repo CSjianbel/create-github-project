@@ -75,16 +75,8 @@ def main():
         repo.create_file(".gitignore", "Added gitignore Template", gitignoreContent)
     
     # Clone Remote Repository
-    os.mkdir(args.repoName)
-    try:
-        pygit2.clone_repository(f"{GITHUB_BASE_URL}/{user.login}/{args.repoName}", args.repoName)
-    except:
-        print(f"Error in cloning Repository - Remote Repository successfuly created : https://github.com/{user.login}/{args.repoName}")
-        os.rmdir(args.repoName)
-        sys.exit(500)
-
+    cloneRepo(args.repoAccess)
     print(f"Repository Url: https://github.com/{user.login}/{args.repoName}")
-    print("Github Repository Created/Initialized and Cloned Locally :)")
 
     
 def verifyAuthentication(g):
@@ -161,6 +153,28 @@ def generateGitignore(repo, key):
         return r.status_code
 
     return r.json()["source"]
+
+
+def cloneRepo(access):
+    """
+    Clone the repository if the repository created was set to public 
+    Params: str
+    Return: None
+    """
+    if access != "public":
+        print("Cannot clone private Repository :(")
+        return 
+
+    os.mkdir(args.repoName)
+    try:
+        pygit2.clone_repository(f"{GITHUB_BASE_URL}/{user.login}/{args.repoName}", args.repoName)
+    except:
+        print(f"Error in cloning Repository - Remote Repository successfuly created : https://github.com/{user.login}/{args.repoName}")
+        os.rmdir(args.repoName)
+        sys.exit(500)
+
+    print("Github Repository Created/Initialized and Cloned Locally :)")
+
 
 
 def getToken():
