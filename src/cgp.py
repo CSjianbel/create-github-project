@@ -48,11 +48,15 @@ def main():
 
     # Verify Authentication
     if not verifyAuthentication(g):
-        print("(Authentication Failed): Please Verify your access token...")
-        sys.exit(4)
+        err_exit(4, "(Authentication Failed): Please Verify your access token...")
 
     # Get User 
     user = g.get_user()
+
+    # If repository name provided is already used...
+    if any(repo.name == args.repoName for repo in user.get_repos()):
+        err_exit(5, "Repository name already exists...")
+        
     # Create A Repo Under User - Private/Public
     repo = user.create_repo(args.repoName, private=True if args.repoAccess.lower() == "private" else False)
 
@@ -61,21 +65,19 @@ def main():
     # Generate LICENSE
     licenseContent = generateLicense(repo, args.license)
     if type(licenseContent) == int:
-        print(f"Invalid License Key : API returned with a status code of {licenseContent}")
-        sys.exit(5)
+        err_exit(5, f"Invalid License Key : API returned with a status code of {licenseContent}")
     elif licenseContent:
         repo.create_file("LICENSE", "Added License", licenseContent)
 
     # Generate .gitignore
     gitignoreContent = generateGitignore(repo, args.gitignore)
     if type(gitignoreContent) == int:
-        print(f"Invalid Gitignore Key : API returned with a status code of {gitignoreContent}")
-        sys.exit(5)
+        err_exit(5, f"Invalid Gitignore Key : API returned with a status code of {gitignoreContent}")
     elif gitignoreContent:
         repo.create_file(".gitignore", "Added gitignore Template", gitignoreContent)
     
     # Clone Remote Repository
-    cloneRepo(args.repoAccess)
+    cloneRepo(args, user)
     print(f"Repository Url: https://github.com/{user.login}/{args.repoName}")
 
     
@@ -155,26 +157,24 @@ def generateGitignore(repo, key):
     return r.json()["source"]
 
 
-def cloneRepo(access):
+def cloneRepo(args, user):
     """
     Clone the repository if the repository created was set to public 
-    Params: str
+    Params: argparse object, User
     Return: None
     """
-    if access != "public":
+    if  args.repoAccess != "public":
         print("Cannot clone private Repository :(")
         return 
 
     os.mkdir(args.repoName)
     try:
         pygit2.clone_repository(f"{GITHUB_BASE_URL}/{user.login}/{args.repoName}", args.repoName)
-    except:
-        print(f"Error in cloning Repository - Remote Repository successfuly created : https://github.com/{user.login}/{args.repoName}")
+    except:  
         os.rmdir(args.repoName)
-        sys.exit(500)
+        err_exit(500, f"Error in cloning Repository - Remote Repository successfuly created : https://github.com/{user.login}/{args.repoName}")
 
     print("Github Repository Created/Initialized and Cloned Locally :)")
-
 
 
 def getToken():
@@ -184,6 +184,10 @@ def getToken():
     """
     with open(ACCESS_TOKEN) as f:
         return f.read().strip("\n")
+
+def err_exit(code, msg=''):
+    print(msg)
+    sys.exit(code)
 
 
 if __name__ == "__main__":
